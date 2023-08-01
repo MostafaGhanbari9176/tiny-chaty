@@ -23,8 +23,8 @@ export class AuthService {
         let otp = ""
         let cIndex = 0
         for (let i = 0; i < this.otpLength; ++i) {
-            cIndex = Math.random() * raw.length
-            otp += raw[cIndex]
+            cIndex = Math.random() * (raw.length - 1)
+            otp += raw[Math.ceil(cIndex)]
         }
 
         return otp
