@@ -1,7 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { UnAuthRoutes } from 'src/decorator/auth.decorator';
 import { CheckOtpDTO, LoginDTO } from './auth.dto';
 import { AuthService } from './auth.service';
 
+@UnAuthRoutes()
 @Controller('auth')
 export class AuthController {
 
