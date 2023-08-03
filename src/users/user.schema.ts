@@ -21,8 +21,8 @@ export class User{
     @Prop()
     email:string
 
-    @Prop({type:Session})
-    session:Session
+    @Prop([Session])
+    session:Session[]
 
 }
 

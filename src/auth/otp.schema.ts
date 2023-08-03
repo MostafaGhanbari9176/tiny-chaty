@@ -9,8 +9,8 @@ export class OTP{
     @Prop()
     code:string
 
-    @Prop({type:Date})
-    createdAt?:Date
+    @Prop({type:Date, required:true})
+    createdAt:Date
     
 }
 

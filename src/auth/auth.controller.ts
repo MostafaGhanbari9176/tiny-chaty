@@ -9,7 +9,7 @@ export class AuthController {
 
     @Post('/requestOTP')
     requestOTP(@Body() loginData: LoginDTO) {
-        this.service.sendOTP(loginData.email)
+        return this.service.sendOTP(loginData.email)
         return {
             message: "Success"
         }
@@ -19,7 +19,7 @@ export class AuthController {
     async checkOTP(@Body() otpData: CheckOtpDTO) {
         const otpIsOK = await this.service.checkOTP(otpData)
         if (otpIsOK)
-            this.service.createUserIfNotExist(otpData.email)
+            return this.service.createUserIfNotExist(otpData.email)
     }
 
 }

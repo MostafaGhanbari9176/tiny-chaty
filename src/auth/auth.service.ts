@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/users/user.schema';
@@ -12,23 +13,24 @@ export class AuthService {
 
     constructor(
         @InjectModel(OTP.name) private readonly otpModel: Model<OTP>,
-        @InjectModel(User.name) private readonly userModel: Model<User>
+        @InjectModel(User.name) private readonly userModel: Model<User>,
+        private readonly jwtService: JwtService
     ) { }
 
     async sendOTP(email: string) {
         const otp = await this.generateOTP()
-        const otpObject = new this.otpModel({ code: otp, targetEmail: email })
+        const otpObject = new this.otpModel({ code: otp, targetEmail: email, createdAt: new Date() })
         return otpObject.save()
     }
 
     async checkOTP(otpData: CheckOtpDTO): Promise<Boolean> {
-        const otpObject = await this.otpModel.findOne({ targetEmail: otpData.email, otp: otpData.otp }).exec()
+        const otpObject = await this.otpModel.findOne({ targetEmail: otpData.email, code: otpData.otp }).exec()
         if (!otpObject)
             throw new BadRequestException("otp not found")
 
         const now = new Date()
-        const expireDate = otpObject.createdAt!
-        expireDate?.setMinutes(3)
+        const expireDate = otpObject.createdAt
+        expireDate.setMinutes(expireDate.getMinutes() + 3)
 
         if (now > expireDate)
             throw new BadRequestException("otp is expired")
@@ -39,17 +41,25 @@ export class AuthService {
     async createUserIfNotExist(email: string) {
         let user = await this.userModel.findOne({ email: email }).exec()
         if (!user)
-            await this.createUser(email)
+            user = await this.createUser(email)
+
+        const token = await this.jwtService.signAsync({ sub: user._id })
+
+        user.session.push({
+            clientDetail: {
+                name: "",
+                ip: ""
+            },
+            createdAt: new Date(),
+            token: token
+        })
+
+        return await user.save()
     }
 
     async createUser(email: string) {
-        const newUser = new this.userModel({
-            email: email,
-            session: {
-                token: "",
-                createdAt: new Date()
-            }
-        })
+        const newUser = new this.userModel({ email: email })
+        return newUser.save()
     }
 
     private async generateOTP() {
