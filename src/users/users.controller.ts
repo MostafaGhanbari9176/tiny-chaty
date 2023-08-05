@@ -16,8 +16,12 @@ export class UsersController {
 
     @Post('/profile')
     updateProfile(@Body() newData:UpdateProfileDTO, @Req() req:any){
-        console.log(`from profile ${JSON.stringify(newData)}`)
         return this.service.updateProfile(req['user']['sub'] ,newData)
+    }
+
+    @Get('/sessions')
+    getSessions(@Req() req:any){
+        return this.service.getSessions(req['user']['sub'])
     }
 
 }

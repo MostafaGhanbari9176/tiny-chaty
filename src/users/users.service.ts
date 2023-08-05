@@ -41,4 +41,8 @@ export class UsersService {
         }
     }
 
+    async getSessions(docId:ObjectId){
+        return this.userModel.findOne({_id:docId}, {_id:0, sessions:1})
+    }
+
 }
