@@ -43,9 +43,9 @@ export class AuthService {
         if (!user)
             user = await this.createUser(email)
 
-        const token = await this.jwtService.signAsync({ sub: user._id })
+        const token = await this.jwtService.signAsync({ sub: user._id, email:email })
 
-        user.session.push({
+        user.sessions.push({
             clientDetail: {
                 name: "",
                 ip: ""

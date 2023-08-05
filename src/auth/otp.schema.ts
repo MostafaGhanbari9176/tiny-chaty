@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 @Schema()
 export class OTP{
 
-    @Prop()
+    @Prop({unique:true})
     targetEmail:string
 
     @Prop()
