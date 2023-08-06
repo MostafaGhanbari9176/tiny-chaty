@@ -1,22 +1,31 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Date, ObjectId } from "mongoose";
+import { Date, ObjectId, SchemaTypes } from "mongoose";
+
+export enum ChatTypes{
+    Channel = "Channel",
+    Private = "Private",
+    Group = "Group"
+}
 
 @Schema()
 export class Chat{
 
+    @Prop({unique:true})
+    id:string
+
     @Prop()
     name:string
 
-    @Prop()
-    type:string
+    @Prop({type:String, required:true, enum:ChatTypes})
+    type:ChatTypes
 
-    @Prop()
+    @Prop({type:SchemaTypes.ObjectId, required:true})
     creator:ObjectId
 
-    @Prop()
+    @Prop({type:Date, required:true})
     createdAt:Date
 
-    @Prop()
+    @Prop([{type:SchemaTypes.ObjectId}])
     members:ObjectId[]
 
 }
