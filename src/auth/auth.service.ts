@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { User } from 'src/users/user.schema';
 import { CheckOtpDTO } from './auth.dto';
 import { OTP } from './otp.schema';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +39,7 @@ export class AuthService {
         return true
     }
 
-    async createUserIfNotExist(email: string) {
+    async createUserIfNotExist(req:Request, email: string) {
         let user = await this.userModel.findOne({ email: email }).exec()
         if (!user)
             user = await this.createUser(email)
@@ -47,8 +48,8 @@ export class AuthService {
 
         user.sessions.push({
             clientDetail: {
-                name: "",
-                ip: ""
+                name: req.headers['user-agent'] ?? "unknown",
+                ip: req.ip
             },
             createdAt: new Date(),
             token: token
