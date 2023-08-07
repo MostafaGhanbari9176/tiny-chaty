@@ -4,11 +4,15 @@ import { Model, ObjectId } from 'mongoose';
 import { Chat, ChatTypes } from './chat.schema';
 import { CreateChatDTO, NewMemberDTO } from './chat.dto';
 import { SuccessResponseDTO } from 'src/dto/response.dto';
+import { User } from 'src/users/user.schema';
 
 @Injectable()
 export class ChatsService {
 
-    constructor(@InjectModel(Chat.name) private readonly chatModel: Model<Chat>) { }
+    constructor(
+        @InjectModel(Chat.name) private readonly chatModel: Model<Chat>,
+        @InjectModel(User.name) private readonly userModel: Model<User>
+    ) { }
 
     async createChat(creator: ObjectId, data: CreateChatDTO) {
         const newChat = new this.chatModel({
@@ -38,6 +42,11 @@ export class ChatsService {
 
         if (chat.type == ChatTypes.Private)
             throw new BadRequestException("you can add a new member to Private chat")
+
+        const matchCount = await this.userModel.count({ _id: { $in: data.newMembers } })
+
+        if (matchCount != data.newMembers.length)
+            throw new BadRequestException("user ids wrong")
 
         //prevent of duplicated members by addToSet operator
         await chat.updateOne({ $addToSet: { members: { $each: data.newMembers } } })

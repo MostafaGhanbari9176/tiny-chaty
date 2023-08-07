@@ -6,8 +6,6 @@ export class ValidationPipe implements PipeTransform {
 
     async transform(value: any, { metatype }: ArgumentMetadata) {
 
-        console.log(`from validation pipe:${JSON.stringify(metatype)}, ${metatype}`)
-
         if (!metatype || !toValidate(metatype))
             return value
 
