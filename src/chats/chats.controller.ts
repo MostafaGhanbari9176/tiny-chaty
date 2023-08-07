@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { CreateChatDTO, NewMemberDTO } from './chat.dto';
-import { Request } from 'express';
+
 
 @Controller('chats')
 export class ChatsController {
@@ -15,7 +15,7 @@ export class ChatsController {
 
     @Post('newMember')
     async newMembers(@Req() req:any, @Body() data:NewMemberDTO){
-        await this.service.newMembers(req['user']['sub'], data)
+        return await this.service.newMembers(req['user']['sub'], data)
     }
 
 }

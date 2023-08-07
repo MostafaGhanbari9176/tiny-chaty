@@ -39,9 +39,10 @@ export class ChatsService {
         if (chat.type == ChatTypes.Private)
             throw new BadRequestException("you can add a new member to Private chat")
 
-        chat.members.push(...data.newMembers)
+        //prevent of duplicated members by addToSet operator
+        await chat.updateOne({ $addToSet: { members: { $each: data.newMembers } } })
 
-        return chat.save()
+        return new SuccessResponseDTO()
     }
 
 }
