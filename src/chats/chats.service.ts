@@ -54,20 +54,31 @@ export class ChatsService {
         return new SuccessResponseDTO()
     }
 
-    async getUserChats(@Req() req:any){
+    async getUserChats(@Req() req: any) {
 
         const userId = req['user']['sub']
 
-        const chats =  await this.chatModel.find({creator: userId}).exec()
+        const chats = await this.chatModel.find({ creator: userId }).exec()
 
-        let users:User[]
+        const completeChats = {}
 
-        const completeChat = chats.map( async (chat:Chat) => {
-            users = await this.userModel.find({_id:{$in: chats }}).exec()
-            
-        })
+        for (let i = 0; i < chats.length; ++i) {
 
+            const users = await this.userModel.find(
+                { _id: { $in: chats[i].members } },
+                { _id: 0, name: 1, family: 1, email: 1 }
+            ).exec()
 
+            return {
+                id: chats[i].id,
+                type: chats[i].type,
+                name: chats[i].name,
+                members: chats[i].members
+            }
+
+        }
+
+        return completeChats
     }
 
 }

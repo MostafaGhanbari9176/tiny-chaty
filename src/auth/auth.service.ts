@@ -29,6 +29,8 @@ export class AuthService {
         if (!otpObject)
             throw new BadRequestException("otp not found")
 
+        console.log(JSON.stringify(otpObject))
+
         const now = new Date()
         const expireDate = otpObject.createdAt
         expireDate.setMinutes(expireDate.getMinutes() + 3)
