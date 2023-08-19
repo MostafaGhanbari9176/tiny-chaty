@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, Req } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Chat, ChatTypes } from './chat.schema';
@@ -52,6 +52,22 @@ export class ChatsService {
         await chat.updateOne({ $addToSet: { members: { $each: data.newMembers } } })
 
         return new SuccessResponseDTO()
+    }
+
+    async getUserChats(@Req() req:any){
+
+        const userId = req['user']['sub']
+
+        const chats =  await this.chatModel.find({creator: userId}).exec()
+
+        let users:User[]
+
+        const completeChat = chats.map( async (chat:Chat) => {
+            users = await this.userModel.find({_id:{$in: chats }}).exec()
+            
+        })
+
+
     }
 
 }
