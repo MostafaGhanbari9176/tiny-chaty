@@ -5,6 +5,7 @@ import { AuthGuard } from './guard/auth.guard';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { ChatsModule } from './chats/chats.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { ChatsModule } from './chats/chats.module';
       { dbName: "chat" }),
     AuthModule,
     UsersModule,
-    ChatsModule
+    ChatsModule,
+    MessagesModule
   ],
   providers:[
     {

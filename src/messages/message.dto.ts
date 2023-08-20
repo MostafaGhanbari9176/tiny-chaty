@@ -1,21 +1,15 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { ObjectId } from "mongoose";
+import { IsMongoId, IsString } from "class-validator"
 
 
-@Schema()
-export class Message{
+export class CreateMessage{
 
-    @Prop()
+    @IsString()
     text:string
 
-    @Prop()
-    senderId:ObjectId
-
-    @Prop()
-    chatId:ObjectId
+    @IsMongoId()
+    chatId:string
 
 }
 
 
-export const MessageSchema = SchemaFactory.createForClass(Message)
 
