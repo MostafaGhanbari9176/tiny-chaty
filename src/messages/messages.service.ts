@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateMessageDTO } from './message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
@@ -10,12 +10,18 @@ import { ChatsService } from 'src/chats/chats.service';
 export class MessagesService {
 
     constructor(
-        @InjectModel(Message.name) private readonly messageModel: Model<Message>
+        @InjectModel(Message.name) private readonly messageModel: Model<Message>,
+        private readonly chatService: ChatsService
     ) { }
 
     async createMessage(req: any, data: CreateMessageDTO) {
 
         const creator = req['user']['sub']
+
+        const canAccessToChat = this.chatService.canAccessToThisChat(creator, data.chatId)
+
+        if (!canAccessToChat)
+            throw new ForbiddenException("you can not access to this chat!")
 
         const messageNumber = await this.createMessageNumber(data.chatId)
 

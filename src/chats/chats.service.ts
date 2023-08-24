@@ -41,7 +41,7 @@ export class ChatsService {
             throw new ForbiddenException("just creator can add new members")
 
         if (chat.type == ChatTypes.Private)
-            throw new BadRequestException("you can add a new member to Private chat")
+            throw new BadRequestException("you can not add a new member to Private chat")
 
         const matchCount = await this.userModel.count({ _id: { $in: data.newMembers } })
 
@@ -70,7 +70,7 @@ export class ChatsService {
             ).exec()
 
             return {
-                chatId:chats[i]._id,
+                chatId: chats[i]._id,
                 name: chats[i].name,
                 type: chats[i].type,
                 title: chats[i].title,
@@ -80,6 +80,22 @@ export class ChatsService {
         }
 
         return completeChats
+    }
+
+    async canAccessToThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {
+
+        const chat = this.chatModel.findOne({ _id: chatId, members: userId })
+
+        return chat != undefined
+
+    }
+
+    async ownerOfThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {
+
+        const chat = this.chatModel.findOne({ _id: chatId, creator: userId }).exec()
+
+        return chat != undefined
+
     }
 
 }
