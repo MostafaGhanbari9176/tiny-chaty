@@ -5,23 +5,28 @@ import { ObjectId } from "mongoose";
 @Schema()
 export class Message {
 
-    @Prop()
+    @Prop({ required: true })
     text: string
 
-    @Prop()
+    @Prop({ required: true })
     creator: ObjectId
 
-    @Prop({ index: true })
+    @Prop({ required: true })
     chatId: ObjectId
 
-    @Prop({ index: true, default: 1 })
-    counter: number
+    @Prop({ default: 1, required: true })
+    messageNumber: number
 
-    @Prop()
+    @Prop({ required: true })
     createdAt: Date
+
+    @Prop({ required: false })
+    parentMessage: ObjectId
 
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message)
+
+MessageSchema.index({ chatId: 1, counter: -1 }, { unique: true })
 
 

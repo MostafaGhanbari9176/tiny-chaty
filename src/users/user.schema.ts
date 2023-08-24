@@ -1,31 +1,31 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 
-export class Session{
-    
-    token:string
+export class Session {
 
-    createdAt:Date
+    token: string
 
-    clientDetail:{name:string, ip:string}
+    createdAt: Date
+
+    clientDetail: { name: string, ip: string }
 }
 
 @Schema()
-export class User{
+export class User {
 
-    @Prop({unique:true})
-    username:string
-
-    @Prop()
-    name:string
+    @Prop({ unique: true })
+    username: string
 
     @Prop()
-    family:string
+    name: string
 
-    @Prop({unique:true})
-    email:string
+    @Prop()
+    family: string
+
+    @Prop({ unique: true })
+    email: string
 
     @Prop([Session])
-    sessions:Session[]
+    sessions: Session[]
 
 }
 

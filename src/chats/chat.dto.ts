@@ -10,19 +10,19 @@ export class CreateChatDTO {
 
     @IsString()
     name: string
-    
+
     @IsEnum(ChatTypes)
     type: ChatTypes
 }
 
-export class NewMemberDTO{
+export class NewMemberDTO {
 
     @IsString()
-    chatId:string
+    chatId: string
 
     @IsArray()
-    @IsMongoId({each:true})
-    newMembers:ObjectId[]
+    @IsMongoId({ each: true })
+    newMembers: ObjectId[]
 
 }
 

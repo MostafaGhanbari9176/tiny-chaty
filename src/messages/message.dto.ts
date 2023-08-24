@@ -1,13 +1,27 @@
 import { IsMongoId, IsString } from "class-validator"
+import { ObjectId } from "mongoose"
 
 
-export class CreateMessage{
+export class CreateMessageDTO {
 
     @IsString()
-    text:string
+    text: string
 
     @IsMongoId()
-    chatId:string
+    chatId: ObjectId
+
+}
+
+export class ReplayMessageDTO {
+
+    @IsString()
+    replay: string
+
+    @IsMongoId()
+    chatId: ObjectId
+
+    @IsMongoId()
+    parentMessage: ObjectId
 
 }
 
