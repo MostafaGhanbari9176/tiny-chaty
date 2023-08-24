@@ -16,8 +16,8 @@ export class ChatsService {
 
     async createChat(creator: ObjectId, data: CreateChatDTO) {
         const newChat = new this.chatModel({
-            id: data.id,
             name: data.name,
+            title: data.title,
             type: data.type,
             creator: creator,
             createdAt: new Date(),
@@ -33,7 +33,7 @@ export class ChatsService {
     }
 
     async newMembers(requester: ObjectId, data: NewMemberDTO) {
-        const chat = await this.chatModel.findOne({ id: data.chatId }).exec()
+        const chat = await this.chatModel.findOne({ _id: data.chatId }).exec()
         if (!chat)
             throw new NotFoundException("chat not found")
 
@@ -70,9 +70,10 @@ export class ChatsService {
             ).exec()
 
             return {
-                id: chats[i].id,
-                type: chats[i].type,
+                chatId:chats[i]._id,
                 name: chats[i].name,
+                type: chats[i].type,
+                title: chats[i].title,
                 members: chats[i].members
             }
 

@@ -11,10 +11,10 @@ export enum ChatTypes{
 export class Chat{
 
     @Prop({unique:true})
-    id:string
+    name:string
 
     @Prop()
-    name:string
+    title:string
 
     @Prop({type:String, required:true, enum:ChatTypes})
     type:ChatTypes

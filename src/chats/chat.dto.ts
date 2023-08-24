@@ -6,10 +6,10 @@ import { Type } from "class-transformer"
 
 export class CreateChatDTO {
     @IsString()
-    id: string
+    name: string
 
     @IsString()
-    name: string
+    title: string
 
     @IsEnum(ChatTypes)
     type: ChatTypes
@@ -17,8 +17,8 @@ export class CreateChatDTO {
 
 export class NewMemberDTO {
 
-    @IsString()
-    chatId: string
+    @IsMongoId()
+    chatId: ObjectId
 
     @IsArray()
     @IsMongoId({ each: true })
