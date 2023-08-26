@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO } from './message.dto';
+import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO, ReplayMessageDTO } from './message.dto';
 
 @Controller('messages')
 export class MessagesController {
@@ -32,6 +32,11 @@ export class MessagesController {
 
         return await this.service.previewsMessages(req, data)
 
+    }
+
+    @Post('/replay')
+    async replayMessage(@Req() req: any, @Body() data: ReplayMessageDTO) {
+        return this.service.replayMessage(req, data)
     }
 
 }

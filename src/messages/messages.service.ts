@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO } from './message.dto';
+import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO, ReplayMessageDTO } from './message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Model, ObjectId } from 'mongoose';
@@ -77,6 +77,34 @@ export class MessagesService {
 
 
         return new ListResponse(messages)
+    }
+
+    async replayMessage(req: any, data: ReplayMessageDTO) {
+
+        const requester = req['user']['sub']
+
+        if (!this.chatService.canAccessToThisChat(requester, data.chatId))
+            throw new ForbiddenException("you cant access to this chat")
+
+        try {
+            const newMessage = new this.messageModel({
+                chatId: data.chatId,
+                createdAt: new Date(),
+                messageNumber: this.createMessageNumber(data.chatId),
+                creator: requester,
+                parentMessage: data.parentMessage,
+                text: data.replay
+            })
+
+            await newMessage.save()
+
+        }
+        catch {
+            return new FailedResponseDTO()
+        }
+
+        return new SuccessResponseDTO()
+
     }
 
     private async createMessageNumber(chatId: ObjectId): Promise<number> {
