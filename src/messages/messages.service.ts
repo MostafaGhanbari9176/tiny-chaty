@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateMessageDTO, GetNewMessagesDTO, GetPreMessagesDTO } from './message.dto';
+import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO } from './message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Model, ObjectId } from 'mongoose';
@@ -43,7 +43,7 @@ export class MessagesService {
 
     }
 
-    async nextMessages(req: any, data: GetNewMessagesDTO) {
+    async nextMessages(req: any, data: GetNextMessagesDTO) {
 
         const requester = req['user']['sub']
 

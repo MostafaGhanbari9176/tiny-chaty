@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { ObjectId } from "mongoose";
+import { ObjectId, STATES, SchemaTypes } from "mongoose";
 
 
 @Schema()
@@ -8,19 +8,19 @@ export class Message {
     @Prop({ required: true })
     text: string
 
-    @Prop({ required: true })
+    @Prop({ type: SchemaTypes.ObjectId, required: true })
     creator: ObjectId
 
-    @Prop({ required: true })
+    @Prop({ type: SchemaTypes.ObjectId, required: true })
     chatId: ObjectId
 
     @Prop({ default: 1, required: true })
     messageNumber: number
 
-    @Prop({ required: true })
+    @Prop({ type: Date, required: true })
     createdAt: Date
 
-    @Prop({ required: false })
+    @Prop({ type: SchemaTypes.ObjectId, required: false })
     parentMessage: ObjectId
 
 }
