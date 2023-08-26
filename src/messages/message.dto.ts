@@ -1,4 +1,4 @@
-import { IsMongoId, IsString } from "class-validator"
+import { IsMongoId, IsNumber, IsString } from "class-validator"
 import { ObjectId } from "mongoose"
 
 
@@ -26,4 +26,23 @@ export class ReplayMessageDTO {
 }
 
 
+export class GetNextMessagesDTO {
+
+    @IsMongoId()
+    chatId: ObjectId
+
+    @IsNumber()
+    lastMessageNumber: Number
+
+}
+
+export class GetPreMessagesDTO {
+
+    @IsMongoId()
+    chatId: ObjectId
+
+    @IsNumber()
+    firstMessageNumber: Number
+
+}
 

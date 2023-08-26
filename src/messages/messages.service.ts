@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateMessageDTO } from './message.dto';
+import { CreateMessageDTO, GetNewMessagesDTO, GetPreMessagesDTO } from './message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Model, ObjectId } from 'mongoose';
-import { FailedResponseDTO, SuccessResponseDTO } from 'src/dto/response.dto';
+import { FailedResponseDTO, ListResponse, SuccessResponseDTO } from 'src/dto/response.dto';
 import { ChatsService } from 'src/chats/chats.service';
+import { count } from 'console';
 
 @Injectable()
 export class MessagesService {
@@ -42,8 +43,40 @@ export class MessagesService {
 
     }
 
-    newMessagesList() {
+    async nextMessages(req: any, data: GetNewMessagesDTO) {
 
+        const requester = req['user']['sub']
+
+        if (!this.chatService.canAccessToThisChat(requester, data.chatId))
+            return new ForbiddenException("you cant access to this chat")
+
+
+        const messages = this.messageModel.find(
+            {
+                chatId: data.chatId,
+                messageNumber: { $gt: data.lastMessageNumber }
+            }).limit(10).sort({ messageNumber: 1 })
+
+
+        return new ListResponse(messages)
+
+    }
+
+    async previewsMessages(req: any, data: GetPreMessagesDTO) {
+        const requester = req['user']['sub']
+
+        if (!this.chatService.canAccessToThisChat(requester, data.chatId))
+            return new ForbiddenException("you cant access to this chat")
+
+
+        const messages = this.messageModel.find(
+            {
+                chatId: data.chatId,
+                messageNumber: { $lt: data.firstMessageNumber }
+            }).limit(10).sort({ messageNumber: 1 })
+
+
+        return new ListResponse(messages)
     }
 
     private async createMessageNumber(chatId: ObjectId): Promise<number> {
