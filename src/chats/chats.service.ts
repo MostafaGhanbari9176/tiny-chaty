@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, Req } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
-import { Chat, ChatTypes } from './chat.schema';
+import { Model, ObjectId, Schema } from 'mongoose';
+import { Chat, ChatMember, ChatTypes } from './chat.schema';
 import { CreateChatDTO, NewMemberDTO } from './chat.dto';
 import { SuccessResponseDTO } from 'src/dto/response.dto';
 import { User } from 'src/users/user.schema';
@@ -48,13 +48,15 @@ export class ChatsService {
         if (matchCount != data.newMembers.length)
             throw new BadRequestException("user ids wrong")
 
+        const chatMember = data.newMembers.map(member => { return { member: member, lastSawMessage: -1 } })
+
         //prevent of duplicated members by addToSet operator
-        await chat.updateOne({ $addToSet: { members: { $each: data.newMembers } } })
+        await chat.updateOne({ $addToSet: { members: { $each: chatMember } } })
 
         return new SuccessResponseDTO()
     }
 
-    async getUserChats(@Req() req: any) {
+    async getUserChats(req: any) {
 
         const userId = req['user']['sub']
 
@@ -80,6 +82,22 @@ export class ChatsService {
         }
 
         return completeChats
+    }
+
+    async updateLastSawMessage(chatId: ObjectId, requester: ObjectId, lastSawMessage: number) {
+        const chat = await this.chatModel.findOne({ _id: chatId }).exec()
+
+        const chatMember = chat?.members.find(member => member.member == requester)
+
+        if (chatMember != null)
+            chatMember.lastSawMessage = lastSawMessage
+
+        await chat?.save()
+
+    }
+
+    async abstractOfUserChats(req: any) {
+
     }
 
     async canAccessToThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {

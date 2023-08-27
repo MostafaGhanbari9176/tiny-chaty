@@ -51,12 +51,14 @@ export class MessagesService {
             return new ForbiddenException("you cant access to this chat")
 
 
-        const messages = this.messageModel.find(
+        const messages = await this.messageModel.find(
             {
                 chatId: data.chatId,
                 messageNumber: { $gt: data.lastMessageNumber }
-            }).limit(10).sort({ messageNumber: 1 })
+            }).sort({ messageNumber: -1 }).limit(10).sort({ messageNumber: 1 })
 
+
+        this.chatService.updateLastSawMessage(data.chatId, requester, messages[messages.length - 1].messageNumber)
 
         return new ListResponse(messages)
 
@@ -119,6 +121,7 @@ export class MessagesService {
 
         return (lastMessageNumber?.messageNumber ?? 0) + 1
     }
+
 
 }
 
