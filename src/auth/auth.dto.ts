@@ -1,39 +1,48 @@
 import { IsEmail, IsString } from "class-validator";
+import { ObjectId } from "mongoose";
 
 export class LoginDTO {
 
     @IsEmail()
-    email:string
+    email: string
 
 }
 
-export class CheckOtpDTO{
+export class CheckOtpDTO {
 
     @IsEmail()
-    email:string
+    email: string
 
     @IsString()
-    otp:String
+    otp: String
 
 }
 
-export class RegisterDTO{
+export class RegisterDTO {
 
     @IsEmail()
-    email:string
+    email: string
 
     @IsString()
-    username:string
+    username: string
 
     @IsString()
-    name:string
+    name: string
 
     @IsString()
-    family:string
+    family: string
 
     @IsString()
-    otp:string
+    otp: string
 
+}
+
+export class IdentifierDTO {
+
+    userId: ObjectId
+
+    email: string
+    
 }
 
 
