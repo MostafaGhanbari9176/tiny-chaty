@@ -15,9 +15,7 @@ export class MessagesService {
         private readonly chatService: ChatsService
     ) { }
 
-    async createMessage(req: any, data: CreateMessageDTO) {
-
-        const creator = req['user']['sub']
+    async createMessage(creator:ObjectId, data: CreateMessageDTO) {
 
         const canAccessToChat = this.chatService.canAccessToThisChat(creator, data.chatId)
 
@@ -43,9 +41,7 @@ export class MessagesService {
 
     }
 
-    async nextMessages(req: any, data: GetNextMessagesDTO) {
-
-        const requester = req['user']['sub']
+    async nextMessages(requester:ObjectId, data: GetNextMessagesDTO) {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
             return new ForbiddenException("you cant access to this chat")
@@ -64,8 +60,7 @@ export class MessagesService {
 
     }
 
-    async previewsMessages(req: any, data: GetPreMessagesDTO) {
-        const requester = req['user']['sub']
+    async previewsMessages(requester:ObjectId, data: GetPreMessagesDTO) {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
             return new ForbiddenException("you cant access to this chat")
@@ -81,9 +76,7 @@ export class MessagesService {
         return new ListResponse(messages)
     }
 
-    async replayMessage(req: any, data: ReplayMessageDTO) {
-
-        const requester = req['user']['sub']
+    async replayMessage(requester:ObjectId, data: ReplayMessageDTO) {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
             throw new ForbiddenException("you cant access to this chat")

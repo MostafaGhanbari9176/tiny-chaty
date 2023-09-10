@@ -9,8 +9,8 @@ export class UsersService {
 
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
-    async getProfile(docId: ObjectId) {
-        const user = await this.userModel.findOne({ _id: docId }, { _id: 0, sessions: 0 }).exec()
+    async getProfile(targetId: ObjectId) {
+        const user = await this.userModel.findOne({ _id: targetId }, { _id: 0, sessions: 0 }).exec()
 
         if (!user)
             throw new NotFoundException("user not found")
@@ -18,8 +18,8 @@ export class UsersService {
         return user
     }
 
-    async updateProfile(docId:ObjectId, newDate: UpdateProfileDTO) {
-        const user = await this.userModel.findOne({ _id:docId })
+    async updateProfile(targetId:ObjectId, newDate: UpdateProfileDTO) {
+        const user = await this.userModel.findOne({ _id:targetId })
 
         if (!user)
             throw new NotFoundException("user not found")
@@ -41,8 +41,8 @@ export class UsersService {
         }
     }
 
-    async getSessions(docId:ObjectId){
-        return this.userModel.findOne({_id:docId}, {_id:0, sessions:1})
+    async getSessions(targetId:ObjectId){
+        return this.userModel.findOne({_id:targetId}, {_id:0, sessions:1})
     }
 
 }

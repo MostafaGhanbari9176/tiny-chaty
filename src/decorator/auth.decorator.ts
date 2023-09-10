@@ -7,13 +7,16 @@ export const UnAuthRoutes = () => SetMetadata(IS_PUBLIC_KEY, true)
 
 export const Identifier = createParamDecorator(
 
-    (field: any, ctx: ExecutionContext) => {
+    (field: any, ctx: ExecutionContext): IdentifierDTO => {
 
         const req = ctx.switchToHttp().getRequest()
 
         const user = req['user']
 
-        return user
+        return {
+            userId: user["sub"],
+            email: user["email"]
+        }
 
     }
 
