@@ -6,6 +6,7 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { ChatsModule } from './chats/chats.module';
 import { MessagesModule } from './messages/messages.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { MessagesModule } from './messages/messages.module';
     AuthModule,
     UsersModule,
     ChatsModule,
-    MessagesModule
+    MessagesModule,
+    NotificationModule
   ],
   providers:[
     {
