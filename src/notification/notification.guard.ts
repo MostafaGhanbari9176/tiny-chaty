@@ -13,10 +13,10 @@ export class NotificationGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
 
-    console.log("from notif guard")
 
     const socket = context.switchToWs().getClient()
-    const token = this.fetchToken(socket)
+    const tokenObject = context.switchToWs().getData()
+    const token = this.fetchToken(tokenObject)
 
     if (!token)
       throw new WsException("UnAuthorized")
@@ -35,8 +35,8 @@ export class NotificationGuard implements CanActivate {
 
   }
 
-  fetchToken(socket: Socket): string | undefined {
-    const _token = socket.handshake.auth["token"]
+  fetchToken(tokenObject:{token:string}): string | undefined {
+    const _token = tokenObject["token"]
 
     if (!_token)
       return undefined

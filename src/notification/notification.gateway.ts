@@ -3,19 +3,19 @@ import { ConnectedSocket, OnGatewayConnection, SubscribeMessage, WebSocketGatewa
 import { Server, Socket } from 'socket.io';
 import { NotificationGuard } from './notification.guard';
 
-@UseGuards(NotificationGuard)
 @WebSocketGateway({ path: "/notification", cors: { origin: "*" } })
 export class NotificationGateway implements OnGatewayConnection{
-
-
+  
+  
   handleConnection(client: Socket, ...args: any[]) {
     console.log(`new socket connection: ${client.handshake.auth}`)
   }
-
+  
+  @UseGuards(NotificationGuard)
   @SubscribeMessage('new')
   handleMessage(@ConnectedSocket() client: any, payload: any): void {
 
-    console.log(`new socket subscribe on "new": ${payload}`)
+    console.log(`new socket subscribe on "new": ${client["identifier"]["email"]}`)
 
   }
 
