@@ -137,6 +137,13 @@ export class ChatsService {
 
     }
 
+    async getUserChatsName(userId:ObjectId):Promise<Array<string>>{
+        
+        const chats = await this.chatModel.find({creator:userId},{name:1, _id:-1}).exec()
+        return chats.map(chat => chat.name)
+
+    }
+
     private calculateNumOfNotSawMessages(chats: Document<Chat>[], userId: ObjectId) {
         type resultType = { chatId: ObjectId, numOfNotSawMessages: number }
         const result: resultType[] = []
