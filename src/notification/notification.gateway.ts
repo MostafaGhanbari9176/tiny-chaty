@@ -8,7 +8,7 @@ export class NotificationGateway implements OnGatewayConnection{
   
   
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(`new socket connection: ${client.handshake.auth}`)
+    console.log(`new socket connection: ${JSON.stringify(client.handshake.auth)}`)
   }
   
   @UseGuards(NotificationGuard)

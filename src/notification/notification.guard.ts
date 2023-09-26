@@ -13,13 +13,14 @@ export class NotificationGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
 
+    console.log("from notif guard")
 
     const socket = context.switchToWs().getClient()
     const tokenObject = context.switchToWs().getData()
     const token = this.fetchToken(tokenObject)
 
     if (!token)
-      throw new WsException("UnAuthorized")
+      this.closeConnection(socket)
 
     try {
       const payload = await this.jwtService.verify(token)
@@ -27,12 +28,18 @@ export class NotificationGuard implements CanActivate {
       socket["identifier"] = identifier
     }
     catch {
-      throw new WsException("UnAuthorized")
+      this.closeConnection(socket)
     }
 
     return true;
 
 
+  }
+
+  closeConnection(socket:Socket):never{
+    socket.emit("exception", "Authentication Error")
+    socket.disconnect(true)
+    throw new WsException("UnAuthorized")
   }
 
   fetchToken(tokenObject:{token:string}): string | undefined {
