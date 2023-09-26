@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { ObjectId, STATES, SchemaTypes } from "mongoose";
+import { ObjectId, STATES, SchemaTypes, Types } from "mongoose";
+import { Observable, Subscriber, interval, pipe, publish } from "rxjs";
+import { HotObservable } from "rxjs/internal/testing/HotObservable";
 
 
 @Schema()
@@ -12,7 +14,7 @@ export class Message {
     creator: ObjectId
 
     @Prop({ type: SchemaTypes.ObjectId, required: true })
-    chatId: ObjectId
+    chatId: Types.ObjectId
 
     @Prop({ default: 1, required: true })
     messageNumber: number
@@ -27,6 +29,16 @@ export class Message {
 
 export const MessageSchema = SchemaFactory.createForClass(Message)
 
-MessageSchema.index({ chatId: 1, counter: -1 }, { unique: true })
+// export const MessageSaveObserver = new Observable<Message>()
+
+// console.log("second hook attached")
+// MessageSchema.post('save', function (message: Message, next) {
+//     console.log("second post hook")
+//     MessageSaveObserver.pipe()
+//     next()
+// })
+
+
+MessageSchema.index({ chatId: 1, counter: -1 }, { unique: false })
 
 

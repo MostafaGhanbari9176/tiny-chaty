@@ -3,16 +3,18 @@ import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO, ReplayMessageD
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Model, ObjectId } from 'mongoose';
-import { FailedResponseDTO, ListResponse, SuccessResponseDTO } from 'src/dto/response.dto';
+import { FailedResponseDTO, ListResponse, ResponseDTO, SuccessResponseDTO } from 'src/dto/response.dto';
 import { ChatsService } from 'src/chats/chats.service';
 import { count } from 'console';
+import { NotificationGateway } from 'src/notification/notification.gateway';
 
 @Injectable()
 export class MessagesService {
 
     constructor(
         @InjectModel(Message.name) private readonly messageModel: Model<Message>,
-        private readonly chatService: ChatsService
+        private readonly chatService: ChatsService,
+        private readonly notification:NotificationGateway
     ) { }
 
     async createMessage(creator:ObjectId, data: CreateMessageDTO) {
@@ -34,9 +36,10 @@ export class MessagesService {
 
         try {
             await newMessage.save()
+            this.notification.getServer().in(data.chatId.toString()).emit("new", data.text)
             return new SuccessResponseDTO()
-        } catch {
-            return new FailedResponseDTO()
+        } catch(err) {
+            return new ResponseDTO(err.message, false)
         }
 
     }

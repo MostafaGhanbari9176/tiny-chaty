@@ -137,10 +137,10 @@ export class ChatsService {
 
     }
 
-    async getUserChatsName(userId:ObjectId):Promise<Array<string>>{
+    async getUserChatsId(userId:ObjectId):Promise<Array<Types.ObjectId>>{
         
-        const chats = await this.chatModel.find({creator:userId},{name:1, _id:-1}).exec()
-        return chats.map(chat => chat.name)
+        const chats = await this.chatModel.find({creator:userId},{_id:1}).exec()
+        return chats.map(chat => chat._id)
 
     }
 
