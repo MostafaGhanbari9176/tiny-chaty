@@ -12,8 +12,7 @@ import { NotificationModule } from 'src/notification/notification.module';
   controllers:[MessagesController],
   imports:[
     MongooseModule.forFeature([{name:Message.name, schema:MessageSchema}]),
-    ChatsModule,
-    NotificationModule
+    ChatsModule
   ]
 })
 export class MessagesModule {}

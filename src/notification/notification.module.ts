@@ -4,7 +4,6 @@ import { ChatsModule } from 'src/chats/chats.module';
 
 @Module({
   providers: [NotificationGateway],
-  imports:[ChatsModule],
-  exports:[NotificationGateway]
+  imports:[ChatsModule]
 })
 export class NotificationModule {}

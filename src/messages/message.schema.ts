@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ObjectId, STATES, SchemaTypes, Types } from "mongoose";
-import { Observable, Subscriber, interval, pipe, publish } from "rxjs";
+import { Observable, Subject, Subscriber, interval, pipe, publish } from "rxjs";
 import { HotObservable } from "rxjs/internal/testing/HotObservable";
 
 
@@ -29,14 +29,13 @@ export class Message {
 
 export const MessageSchema = SchemaFactory.createForClass(Message)
 
-// export const MessageSaveObserver = new Observable<Message>()
+export const MessageSaveObserver = new Subject<Message>()
 
-// console.log("second hook attached")
-// MessageSchema.post('save', function (message: Message, next) {
-//     console.log("second post hook")
-//     MessageSaveObserver.pipe()
-//     next()
-// })
+MessageSchema.post('save', function (message: Message, next) {
+    console.log(`on message hook: ${JSON.stringify(message)}`)
+    MessageSaveObserver.next(message)
+    next()
+})
 
 
 MessageSchema.index({ chatId: 1, counter: -1 }, { unique: false })

@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { NotificationGuard } from './notification.guard';
 import { IdentifierDTO } from 'src/auth/auth.dto';
 import { ChatsService } from 'src/chats/chats.service';
-import { Message, MessageSchema } from 'src/messages/message.schema';
+import { Message, MessageSaveObserver } from 'src/messages/message.schema';
 
 @WebSocketGateway({ path: "/notification", cors: { origin: "*" } })
 export class NotificationGateway implements OnGatewayConnection {
@@ -14,7 +14,7 @@ export class NotificationGateway implements OnGatewayConnection {
 
   constructor(private readonly chatService: ChatsService) {
 
-   // this.enableNewMessageHook(this.server)
+    this.enableNewMessageHook()
 
   }
 
@@ -38,14 +38,12 @@ export class NotificationGateway implements OnGatewayConnection {
 
   }
 
-  getServer():Server{ return this.server}
-
-  // private enableNewMessageHook(server:Server) {
-  //   console.log("first hook attached")
-  //   MessageSaveObserver.subscribe((message:Message) => {
-  //     console.log("on new message hook")
-  //     server.in(message.chatId.toString()).emit("new", message)
-  //   })
-  // }
+  private enableNewMessageHook() {
+    MessageSaveObserver.subscribe((message: Message) => {
+      console.log(`on subscriber:${JSON.stringify(message)}`)
+      console.log(`server is null: ${this.server == null}`)
+      this.server?.in(message.chatId.toString()).emit("new", message)
+    })
+  }
 }
 
