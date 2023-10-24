@@ -6,6 +6,7 @@ import { User } from 'src/users/user.schema';
 import { CheckOtpDTO } from './auth.dto';
 import { OTP } from './otp.schema';
 import { Request } from 'express';
+import { SuccessResponseDTO } from 'src/dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,13 +19,21 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async sendOTP(email: string) {
+    async sendOTP(email: string): Promise<SuccessResponseDTO> {
         const otp = await this.generateOTP()
         const otpObject = new this.otpModel({ code: otp, targetEmail: email, createdAt: new Date() })
-        return otpObject.save()
+        await otpObject.save()
+
+        return new SuccessResponseDTO()
     }
 
-    async checkOTP(otpData: CheckOtpDTO): Promise<Boolean> {
+    /**
+     * @usageNotes
+     * its check the otp, if that was notValid its throw exception, otherwise return @void asynchronously
+     * 
+     * @param otpData 
+     */
+    async checkOTP(otpData: CheckOtpDTO): Promise<void> {
         const otpObject = await this.otpModel.findOne({ targetEmail: otpData.email, code: otpData.otp }).exec()
         if (!otpObject)
             throw new BadRequestException("otp not found")
@@ -37,16 +46,14 @@ export class AuthService {
 
         if (now > expireDate)
             throw new BadRequestException("otp is expired")
-
-        return true
     }
 
-    async createUserIfNotExist(req:Request, email: string) {
+    async createUserIfNotExist(req: Request, email: string): Promise<SuccessResponseDTO> {
         let user = await this.userModel.findOne({ email: email }).exec()
         if (!user)
             user = await this.createUser(email)
 
-        const token = await this.jwtService.signAsync({ sub: user._id, email:email })
+        const token = await this.jwtService.signAsync({ sub: user._id, email: email })
 
         user.sessions.push({
             clientDetail: {
@@ -57,10 +64,12 @@ export class AuthService {
             token: token
         })
 
-        return await user.save()
+        await user.save()
+
+        return new SuccessResponseDTO()
     }
 
-    async createUser(email: string) {
+    private async createUser(email: string) {
         const newUser = new this.userModel({ email: email })
         return newUser.save()
     }

@@ -2,8 +2,8 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException,
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model, ObjectId, Schema, Types } from 'mongoose';
 import { Chat, ChatMember, ChatTypes } from './chat.schema';
-import { CreateChatDTO, NewMemberDTO } from './chat.dto';
-import { ListResponse, SuccessResponseDTO } from 'src/dto/response.dto';
+import { AbstractMessageDTO, CreateChatDTO, NewMemberDTO, UserChatListResponseDTO, UserOwnChatListResponseDTO } from './chat.dto';
+import { ListResponseDTO, SuccessResponseDTO } from 'src/dto/response.dto';
 import { User } from 'src/users/user.schema';
 import { Message } from 'src/messages/message.schema';
 
@@ -13,10 +13,10 @@ export class ChatsService {
     constructor(
         @InjectModel(Chat.name) private readonly chatModel: Model<Chat>,
         @InjectModel(User.name) private readonly userModel: Model<User>,
-        @InjectModel(Message.name) private readonly messageModel:Model<Message>
+        @InjectModel(Message.name) private readonly messageModel: Model<Message>
     ) { }
 
-    async createChat(creator: ObjectId, data: CreateChatDTO) {
+    async createChat(creator: ObjectId, data: CreateChatDTO): Promise<SuccessResponseDTO> {
         const newChat = new this.chatModel({
             name: data.name,
             title: data.title,
@@ -34,7 +34,7 @@ export class ChatsService {
         }
     }
 
-    async newMembers(requester: ObjectId, data: NewMemberDTO) {
+    async newMembers(requester: ObjectId, data: NewMemberDTO): Promise<SuccessResponseDTO> {
         const chat = await this.chatModel.findOne({ _id: data.chatId }).exec()
         if (!chat)
             throw new NotFoundException("chat not found")
@@ -58,33 +58,48 @@ export class ChatsService {
         return new SuccessResponseDTO()
     }
 
-    async getUserChats(userId:ObjectId) {
+    /**
+     * return a list of chats was user owned
+     * @param userId 
+     * @returns 
+     */
+    async getUserChats(userId: ObjectId): Promise<UserOwnChatListResponseDTO[]> {
 
         const chats = await this.chatModel.find({ creator: userId }).exec()
 
-        const completeChats = {}
+        const completeChats: UserOwnChatListResponseDTO[] = []
 
         for (let i = 0; i < chats.length; ++i) {
 
+            const membersId = chats[i].members.map(member => member.member)
+
             const users = await this.userModel.find(
-                { _id: { $in: chats[i].members } },
+                { _id: { $in: membersId } },
                 { _id: 0, name: 1, family: 1, email: 1 }
             ).exec()
 
-            return {
-                chatId: chats[i]._id,
-                name: chats[i].name,
-                type: chats[i].type,
-                title: chats[i].title,
-                members: chats[i].members
-            }
+            completeChats.push(
+                {
+                    chatId: chats[i]._id,
+                    name: chats[i].name,
+                    type: chats[i].type,
+                    title: chats[i].title,
+                    members: users
+                }
+            )
 
         }
 
         return completeChats
     }
 
-    async updateLastSawMessage(chatId: ObjectId, requester: ObjectId, lastSawMessage: number) {
+    /**
+     * update last saw message
+     * @param chatId 
+     * @param requester 
+     * @param lastSawMessage 
+     */
+    async updateLastSawMessage(chatId: ObjectId, requester: ObjectId, lastSawMessage: number): Promise<void> {
         const chat = await this.chatModel.findOne({ _id: chatId }).exec()
 
         const chatMember = chat?.members.find(member => member.member == requester)
@@ -96,7 +111,12 @@ export class ChatsService {
 
     }
 
-    async abstractOfUserChats(requester:ObjectId) {
+    /**
+     * a abstract list of all chats that was user is a member
+     * @param requester 
+     * @returns 
+     */
+    async abstractOfUserChats(requester: ObjectId): Promise<ListResponseDTO<UserChatListResponseDTO>> {
 
         const chats = await this.chatModel.find({ "$members.member": requester }, { title: 1, members: 1 }).exec()
 
@@ -104,7 +124,7 @@ export class ChatsService {
 
         const abstractMessages = await this.abstractLastMessages(chatsId)
 
-        const result: { chatId: Types.ObjectId, numOfNotSawMessage: number, abstractText: string }[] = []
+        const result: UserChatListResponseDTO[] = []
 
         chats.forEach(chat => {
             const member = chat.members.find(mem => mem.member == requester)
@@ -112,13 +132,13 @@ export class ChatsService {
 
             result.push({
                 chatId: chat._id,
-                numOfNotSawMessage: message.messageNumber - (member?.lastSawMessage ?? 0),
-                abstractText: message.abstractText
+                numOfNotSawMessage: (message?.messageNumber ?? 0) - (member?.lastSawMessage ?? 0),
+                abstractText: message?.abstractText ?? ""
             })
 
         });
 
-        return new ListResponse(result)
+        return new ListResponseDTO<UserChatListResponseDTO>(result)
     }
 
     async canAccessToThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {
@@ -137,9 +157,9 @@ export class ChatsService {
 
     }
 
-    async getUserChatsId(userId:ObjectId):Promise<Array<Types.ObjectId>>{
-        
-        const chats = await this.chatModel.find({creator:userId},{_id:1}).exec()
+    async getUserChatsId(userId: ObjectId): Promise<Array<Types.ObjectId>> {
+
+        const chats = await this.chatModel.find({ creator: userId }, { _id: 1 }).exec()
         return chats.map(chat => chat._id)
 
     }
@@ -152,7 +172,7 @@ export class ChatsService {
 
     }
 
-    private async abstractLastMessages(chatsId: Types.ObjectId[]) {
+    private async abstractLastMessages(chatsId: Types.ObjectId[]): Promise<AbstractMessageDTO[]> {
 
         const messages = await this.messageModel.aggregate(
             [
@@ -163,10 +183,10 @@ export class ChatsService {
                 },
                 {
                     $project: {
-                        chatId:1,
-                        messageNumber:1,
-                        creator:1,
-                        abstractText:{$substrCP:["$text", 0, 10]}
+                        chatId: 1,
+                        messageNumber: 1,
+                        creator: 1,
+                        abstractText: { $substrCP: ["$text", 0, 10] }
                     }
                 }
             ]

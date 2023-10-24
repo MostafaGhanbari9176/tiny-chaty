@@ -1,29 +1,31 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Request, Response } from 'express';
-import { ObjectId } from 'mongoose';
-import { UpdateProfileDTO } from './users.dto';
+import { UpdateProfileDTO, UserProfileResponseDTO, UserSessionsResponseDTO } from './users.dto';
 import { IdentifierDTO } from 'src/auth/auth.dto';
 import { Identifier } from 'src/decorator/auth.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { SuccessResponseDTO } from 'src/dto/response.dto';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
 
     constructor(private readonly service: UsersService) { }
 
     @Get('/profile')
-    getProfile(@Identifier() identifier: IdentifierDTO) {
+    getProfile(@Identifier() identifier: IdentifierDTO): Promise<UserProfileResponseDTO> {
         return this.service.getProfile(identifier.userId)
     }
 
     @Post('/profile')
-    updateProfile(@Body() newData: UpdateProfileDTO, @Identifier() identifier: IdentifierDTO) {
+    updateProfile(@Body() newData: UpdateProfileDTO, @Identifier() identifier: IdentifierDTO): Promise<SuccessResponseDTO> {
         return this.service.updateProfile(identifier.userId, newData)
     }
 
     @Get('/sessions')
-    getSessions(@Identifier() identifier: IdentifierDTO) {
+    getSessions(@Identifier() identifier: IdentifierDTO): Promise<UserSessionsResponseDTO[]> {
         return this.service.getSessions(identifier.userId)
     }
 
 }
+

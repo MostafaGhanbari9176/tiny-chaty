@@ -1,9 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateMessageDTO, GetNextMessagesDTO, GetPreMessagesDTO, ReplayMessageDTO } from './message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './message.schema';
 import { Model, ObjectId } from 'mongoose';
-import { FailedResponseDTO, ListResponse, ResponseDTO, SuccessResponseDTO } from 'src/dto/response.dto';
+import { FailedResponseDTO, ListResponseDTO, ResponseDTO, SuccessResponseDTO } from 'src/dto/response.dto';
 import { ChatsService } from 'src/chats/chats.service';
 import { count } from 'console';
 import { NotificationGateway } from 'src/notification/notification.gateway';
@@ -16,7 +16,7 @@ export class MessagesService {
         private readonly chatService: ChatsService,
     ) { }
 
-    async createMessage(creator:ObjectId, data: CreateMessageDTO) {
+    async createMessage(creator: ObjectId, data: CreateMessageDTO): Promise<SuccessResponseDTO> {
 
         const canAccessToChat = this.chatService.canAccessToThisChat(creator, data.chatId)
 
@@ -36,16 +36,15 @@ export class MessagesService {
         try {
             await newMessage.save()
             return new SuccessResponseDTO()
-        } catch(err) {
-            return new ResponseDTO(err.message, false)
+        } catch {
+            throw new InternalServerErrorException()
         }
-
     }
 
-    async nextMessages(requester:ObjectId, data: GetNextMessagesDTO) {
+    async nextMessages(requester: ObjectId, data: GetNextMessagesDTO): Promise<ListResponseDTO<Message>> {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
-            return new ForbiddenException("you cant access to this chat")
+            throw new ForbiddenException("you cant access to this chat")
 
 
         const messages = await this.messageModel.find(
@@ -57,27 +56,27 @@ export class MessagesService {
 
         this.chatService.updateLastSawMessage(data.chatId, requester, messages[messages.length - 1].messageNumber)
 
-        return new ListResponse(messages)
+        return new ListResponseDTO<Message>(messages)
 
     }
 
-    async previewsMessages(requester:ObjectId, data: GetPreMessagesDTO) {
+    async previewsMessages(requester: ObjectId, data: GetPreMessagesDTO): Promise<ListResponseDTO<Message>> {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
-            return new ForbiddenException("you cant access to this chat")
+            throw new ForbiddenException("you cant access to this chat")
 
 
-        const messages = this.messageModel.find(
+        const messages = await this.messageModel.find(
             {
                 chatId: data.chatId,
                 messageNumber: { $lt: data.firstMessageNumber }
-            }).limit(10).sort({ messageNumber: 1 })
+            }).limit(10).sort({ messageNumber: 1 }).exec()
 
 
-        return new ListResponse(messages)
+        return new ListResponseDTO<Message>(messages)
     }
 
-    async replayMessage(requester:ObjectId, data: ReplayMessageDTO) {
+    async replayMessage(requester: ObjectId, data: ReplayMessageDTO): Promise<SuccessResponseDTO> {
 
         if (!this.chatService.canAccessToThisChat(requester, data.chatId))
             throw new ForbiddenException("you cant access to this chat")
@@ -94,12 +93,12 @@ export class MessagesService {
 
             await newMessage.save()
 
+            return new SuccessResponseDTO()
+
         }
         catch {
-            return new FailedResponseDTO()
+            throw new InternalServerErrorException()
         }
-
-        return new SuccessResponseDTO()
 
     }
 

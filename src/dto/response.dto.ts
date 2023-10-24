@@ -9,15 +9,15 @@ export class SuccessResponseDTO extends ResponseDTO {
 }
 
 export class FailedResponseDTO extends ResponseDTO {
-    constructor() {
-        super("Failed", false)
+    constructor(message:string = "Failed", readonly statusCode:number = 400) {
+        super(message, false)
     }
 }
 
-export class ListResponse extends SuccessResponseDTO {
+export class ListResponseDTO<T> extends SuccessResponseDTO {
 
     constructor(
-        private readonly data: any
+        private readonly data:T[]
     ) {
         super()
     }

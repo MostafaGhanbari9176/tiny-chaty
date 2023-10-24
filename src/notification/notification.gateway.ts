@@ -38,7 +38,7 @@ export class NotificationGateway implements OnGatewayConnection {
 
   }
 
-  private enableNewMessageHook() {
+  private enableNewMessageHook(): void {
     MessageSaveObserver.subscribe((message: Message) => {
       console.log(`on subscriber:${JSON.stringify(message)}`)
       console.log(`server is null: ${this.server == null}`)
