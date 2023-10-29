@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiResponseProperty } from "@nestjs/swagger";
 import { IsEmail, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
 
@@ -66,6 +66,15 @@ export class RegisterDTO {
     })
     otp: string
 
+}
+
+export class CheckOTPResponseDTO{
+    @ApiResponseProperty()
+    token:string
+
+    constructor(token:string){
+        this.token = token
+    }
 }
 
 export class IdentifierDTO {

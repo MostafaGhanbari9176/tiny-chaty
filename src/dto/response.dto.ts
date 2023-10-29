@@ -1,5 +1,27 @@
+import { ApiResponseProperty } from "@nestjs/swagger"
+
+export class ErrorResponseDTO {
+
+    @ApiResponseProperty()
+    readonly statusCode: number
+
+    @ApiResponseProperty()
+    readonly message: string
+
+    @ApiResponseProperty()
+    readonly error: string
+
+}
+
 export class ResponseDTO {
-    constructor(readonly message: string, readonly status: boolean) { }
+    @ApiResponseProperty()
+    readonly message: string
+    @ApiResponseProperty()
+    readonly status: Boolean
+    constructor(message: string, status: boolean) {
+        this.message = message
+        this.status = status
+    }
 }
 
 export class SuccessResponseDTO extends ResponseDTO {
@@ -9,7 +31,7 @@ export class SuccessResponseDTO extends ResponseDTO {
 }
 
 export class FailedResponseDTO extends ResponseDTO {
-    constructor(message:string = "Failed", readonly statusCode:number = 400) {
+    constructor(message: string = "Failed", readonly statusCode: number = 400) {
         super(message, false)
     }
 }
@@ -17,7 +39,7 @@ export class FailedResponseDTO extends ResponseDTO {
 export class ListResponseDTO<T> extends SuccessResponseDTO {
 
     constructor(
-        private readonly data:T[]
+        private readonly data: T[]
     ) {
         super()
     }

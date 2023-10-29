@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/users/user.schema';
-import { CheckOtpDTO } from './auth.dto';
+import { CheckOtpDTO, CheckOTPResponseDTO } from './auth.dto';
 import { OTP } from './otp.schema';
 import { Request } from 'express';
 import { SuccessResponseDTO } from 'src/dto/response.dto';
@@ -64,9 +64,9 @@ export class AuthService {
      * 
      * @param req use for fetching ip and user-agent for session data
      * @param email user email 
-     * @returns the success response
+     * @returns user login token
      */
-    async createUserIfNotExist(req: Request, email: string): Promise<SuccessResponseDTO> {
+    async createUserIfNotExist(req: Request, email: string): Promise<CheckOTPResponseDTO> {
         let user = await this.userModel.findOne({ email: email }).exec()
 
         if (!user)
@@ -85,7 +85,7 @@ export class AuthService {
 
         await user.save()
 
-        return new SuccessResponseDTO()
+        return new CheckOTPResponseDTO(token)
     }
 
     /**
