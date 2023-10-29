@@ -10,6 +10,13 @@ export class UsersService {
 
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
+    /**
+     * @throws { @link NotFoundException }
+     * this exception throws when user not exist
+     * 
+     * @param targetId 
+     * @returns the user profile detail
+     */
     async getProfile(targetId: ObjectId): Promise<UserProfileResponseDTO> {
         const user = await this.userModel.findOne({ _id: targetId }, { _id: 0, sessions: 0 }).exec()
 
@@ -19,6 +26,17 @@ export class UsersService {
         return user
     }
 
+    /**
+     * @throws { @link NotFoundException }
+     * this exception throws when user not exists
+     * 
+     * @throws { @link BadRequestException }
+     * this exception throws when username is already used
+     * 
+     * @param targetId 
+     * @param newDate 
+     * @returns the success response
+     */
     async updateProfile(targetId: ObjectId, newDate: UpdateProfileDTO): Promise<SuccessResponseDTO> {
         const user = await this.userModel.findOne({ _id: targetId })
 
@@ -39,6 +57,13 @@ export class UsersService {
         }
     }
 
+    /**
+     * @throws { @link NotFoundException }
+     * this exception throws when username is already used
+     * 
+     * @param targetId 
+     * @returns a list of user sessions
+     */
     async getSessions(targetId: ObjectId): Promise<UserSessionsResponseDTO[]> {
         const user = await this.userModel.findOne({ _id: targetId }, { _id: 0, sessions: 1 }).exec()
 

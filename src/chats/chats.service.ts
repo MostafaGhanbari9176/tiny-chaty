@@ -16,6 +16,16 @@ export class ChatsService {
         @InjectModel(Message.name) private readonly messageModel: Model<Message>
     ) { }
 
+    /**
+     * creating a new chat
+     * 
+     * @throws { @link BadRequestException }
+     * this exception throws when chat name is duplicated, chat name must bu unique
+     * 
+     * @param creator id of user that create this chat
+     * @param data chat data
+     * @returns the success response
+     */
     async createChat(creator: ObjectId, data: CreateChatDTO): Promise<SuccessResponseDTO> {
         const newChat = new this.chatModel({
             name: data.name,
@@ -34,6 +44,22 @@ export class ChatsService {
         }
     }
 
+    /**
+     * adding new members to a chat
+     * 
+     * @throws { @link NotFoundException }
+     * throws this error when target chat is not exists
+     * 
+     * @throws { @link BadRequestException }
+     * this exception was throws for adding members to a private chat or some members id is wrong
+     * 
+     * @throws { @link ForbiddenException }
+     * this exception throws when requester its not the chat owner
+     * 
+     * @param requester id of user that try to add new members to chat
+     * @param data target chat and members data
+     * @returns the success response
+     */
     async newMembers(requester: ObjectId, data: NewMemberDTO): Promise<SuccessResponseDTO> {
         const chat = await this.chatModel.findOne({ _id: data.chatId }).exec()
         if (!chat)
@@ -61,7 +87,7 @@ export class ChatsService {
     /**
      * return a list of chats was user owned
      * @param userId 
-     * @returns 
+     * @returns a list of chats
      */
     async getUserChats(userId: ObjectId): Promise<UserOwnChatListResponseDTO[]> {
 
@@ -98,6 +124,8 @@ export class ChatsService {
      * @param chatId 
      * @param requester 
      * @param lastSawMessage 
+     * 
+     * @returns void
      */
     async updateLastSawMessage(chatId: ObjectId, requester: ObjectId, lastSawMessage: number): Promise<void> {
         const chat = await this.chatModel.findOne({ _id: chatId }).exec()
@@ -114,7 +142,7 @@ export class ChatsService {
     /**
      * a abstract list of all chats that was user is a member
      * @param requester 
-     * @returns 
+     * @returns a list of chats
      */
     async abstractOfUserChats(requester: ObjectId): Promise<ListResponseDTO<UserChatListResponseDTO>> {
 
@@ -141,6 +169,13 @@ export class ChatsService {
         return new ListResponseDTO<UserChatListResponseDTO>(result)
     }
 
+    /**
+     * checking that the user is a member of chat
+     * 
+     * @param userId 
+     * @param chatId 
+     * @returns true if user is a member otherwise false
+     */
     async canAccessToThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {
 
         const chat = this.chatModel.findOne({ _id: chatId, members: userId })
@@ -149,6 +184,13 @@ export class ChatsService {
 
     }
 
+    /**
+     * checking that the user own a chat or not
+     * 
+     * @param userId 
+     * @param chatId 
+     * @returns true if user own this chat, otherwise false
+     */
     async ownerOfThisChat(userId: ObjectId, chatId: ObjectId): Promise<Boolean> {
 
         const chat = this.chatModel.findOne({ _id: chatId, creator: userId }).exec()
@@ -157,6 +199,10 @@ export class ChatsService {
 
     }
 
+    /**
+     * @param userId 
+     * @returns a list of user chats Id
+     */
     async getUserChatsId(userId: ObjectId): Promise<Array<Types.ObjectId>> {
 
         const chats = await this.chatModel.find({ creator: userId }, { _id: 1 }).exec()
@@ -172,6 +218,10 @@ export class ChatsService {
 
     }
 
+    /**
+     * @param chatsId target chats id
+     * @returns a list of abstracted last message for every targets chat
+     */
     private async abstractLastMessages(chatsId: Types.ObjectId[]): Promise<AbstractMessageDTO[]> {
 
         const messages = await this.messageModel.aggregate(
