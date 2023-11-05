@@ -16,8 +16,10 @@ export class ErrorResponseDTO {
 export class ResponseDTO {
     @ApiResponseProperty()
     readonly message: string
+
     @ApiResponseProperty()
     readonly status: Boolean
+    
     constructor(message: string, status: boolean) {
         this.message = message
         this.status = status

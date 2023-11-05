@@ -47,13 +47,13 @@ export class ChatsService {
     /**
      * adding new members to a chat
      * 
-     * @throws { @link NotFoundException }
+     * @throws {NotFoundException}
      * throws this error when target chat is not exists
      * 
-     * @throws { @link BadRequestException }
+     * @throws {BadRequestException}
      * this exception was throws for adding members to a private chat or some members id is wrong
      * 
-     * @throws { @link ForbiddenException }
+     * @throws {ForbiddenException}
      * this exception throws when requester its not the chat owner
      * 
      * @param requester id of user that try to add new members to chat
@@ -88,8 +88,8 @@ export class ChatsService {
      * return a list of chats was user owned
      * @param userId 
      * @returns a list of chats
-     */
-    async getUserChats(userId: ObjectId): Promise<UserOwnChatListResponseDTO[]> {
+     */ 
+    async getUserChats(userId: ObjectId): Promise<ListResponseDTO<UserOwnChatListResponseDTO>> {
 
         const chats = await this.chatModel.find({ creator: userId }).exec()
 
@@ -116,7 +116,7 @@ export class ChatsService {
 
         }
 
-        return completeChats
+        return new ListResponseDTO<UserOwnChatListResponseDTO>(completeChats)
     }
 
     /**

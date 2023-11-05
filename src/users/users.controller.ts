@@ -3,10 +3,8 @@ import { UsersService } from './users.service';
 import { UpdateProfileDTO, UserProfileResponseDTO, UserSessionsResponseDTO } from './users.dto';
 import { IdentifierDTO } from 'src/auth/auth.dto';
 import { Identifier } from 'src/decorator/auth.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { SuccessResponseDTO } from 'src/dto/response.dto';
 
-@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
 
