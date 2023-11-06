@@ -5,6 +5,8 @@ import { NotificationGuard } from './notification.guard';
 import { IdentifierDTO } from 'src/auth/auth.dto';
 import { ChatsService } from 'src/chats/chats.service';
 import { Message, MessageSaveObserver } from 'src/messages/message.schema';
+import { AsyncApiSub } from 'nestjs-asyncapi';
+import { NotificationTokenDTO } from './notification.dto';
 
 @WebSocketGateway({ path: "/notification", cors: { origin: "*" } })
 export class NotificationGateway implements OnGatewayConnection {
@@ -24,6 +26,11 @@ export class NotificationGateway implements OnGatewayConnection {
 
   @UseGuards(NotificationGuard)
   @SubscribeMessage('new')
+  @AsyncApiSub({
+    channel: "new", message: {
+      payload: NotificationTokenDTO
+    }
+  })
   async handleMessage(@ConnectedSocket() client: any, payload: any): Promise<void> {
 
     const identifier = client["identifier"] as IdentifierDTO

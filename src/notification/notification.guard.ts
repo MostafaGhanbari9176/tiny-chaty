@@ -1,8 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { IdentifierDTO } from 'src/auth/auth.dto';
+import { NotificationTokenDTO } from './notification.dto';
 
 @Injectable()
 export class NotificationGuard implements CanActivate {
@@ -42,7 +43,7 @@ export class NotificationGuard implements CanActivate {
     throw new WsException("UnAuthorized")
   }
 
-  fetchToken(tokenObject:{token:string}): string | undefined {
+  fetchToken(tokenObject:NotificationTokenDTO): string | undefined {
     const _token = tokenObject["token"]
 
     if (!_token)
