@@ -1,7 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class NotificationTokenDTO {
-    @ApiProperty()
+    @ApiProperty({
+        description:"login Bearer token"
+    })
     token: string
 }
 

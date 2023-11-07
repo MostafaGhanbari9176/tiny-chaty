@@ -24,7 +24,7 @@ function setupOpenApi(app: INestApplication): void {
   SwaggerModule.setup('rest-api', app, documentation)
 }
 
-function setupAsyncApi(app: INestApplication) {
+async function setupAsyncApi(app: INestApplication) {
   const config = new AsyncApiDocumentBuilder()
     .setTitle("Chat Application `Socket Events` documentation")
     .setDescription("back-end of a simple chat application, was emitted events thorough the Socket.IO, and handle the rest of the functionality with REST-API.\n"+
@@ -34,21 +34,21 @@ function setupAsyncApi(app: INestApplication) {
     .setVersion("0.0.1")
     .setDefaultContentType('application/json')
     .addSecurity('user-password', {type: 'userPassword'})
-    .addServer('event', {
+    .addServer('/notification', {
       protocol: 'socket.io',
-      url: `ws://localhost:${appPort}`
+      url: `ws://127.0.0.1:${appPort}`
     })
     .build()
 
   const documentation = AsyncApiModule.createDocument(app, config)
-  AsyncApiModule.setup("event-api", app, documentation)
+  await AsyncApiModule.setup("event-api", app, documentation)
 
 }
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  setupAsyncApi(app)
+  await setupAsyncApi(app)
   setupOpenApi(app)
 
   app.useGlobalPipes(new ValidationPipe())
