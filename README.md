@@ -24,17 +24,42 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+back-end of a simple app chat, all functionality like Authentication,PostingMessages and etc are handle by REST-API and just sending new messages to chat members was handled by WebSocket.
+
+## Techs
+
+- [NestJS](https://github.com/nestjs/nest)
+- [Socket.IO](https://socket.io/docs/v4/server-api/)
+- [RXJS](https://rxjs.dev/guide/overview)
+- [JWT](https://www.npmjs.com/package/@nestjs/jwt)
+- [MongoDB, Mongoose](https://docs.nestjs.com/techniques/mongodb)
+- [AsyncAPI](https://www.npmjs.com/package/nestjs-asyncapi)
+- [OpenAPI](https://docs.nestjs.com/openapi/introduction)
+
+## Features
+
+- Private chat
+- Group
+- Channel
+- MessageReplay
 
 ## Installation
 
 ```bash
+# install the dependencies
 $ npm install
+
+# initialize mongodb container and run it
+$ docker run --name 'chatDB' -e MONGO_INITDB_ROOT_USERNAME='root' -e MONGO_INITDB_ROOT_PASSWORD='1234' -e MONGO_INITDB_DATABASE='chat' -dp 8081:27017 mongo:latest
 ```
 
 ## Running the app
 
 ```bash
+
+# running the database container
+$ docker start chatDB
+
 # development
 $ npm run start
 
@@ -45,29 +70,17 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## Documentations
 
-```bash
-# unit tests
-$ npm run test
+- REST-API : ~/rest-api
+- WebSocket : ~/event-api
 
-# e2e tests
-$ npm run test:e2e
+## WebSocket
 
-# test coverage
-$ npm run test:cov
-```
+- handshake path is : /notification
+- for receiving new messages, use 'new' event with this payload {token:Bearer 'login token'}
+- after registering on 'new' event, the user automatically was registered to all chat rooms that user is a member
+- then when a new message post to a chat, that message sended to 'chatId' event
+- so for receiving new messages for each chat, should subscribe on  'chatId' events
+- summary : for receiving new messages -> first subscribe on 'new', then subscribe to all 'chatId' events
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).

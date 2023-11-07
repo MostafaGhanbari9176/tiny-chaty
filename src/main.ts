@@ -27,10 +27,13 @@ function setupOpenApi(app: INestApplication): void {
 async function setupAsyncApi(app: INestApplication) {
   const config = new AsyncApiDocumentBuilder()
     .setTitle("Chat Application `Socket Events` documentation")
-    .setDescription("back-end of a simple chat application, was emitted events thorough the Socket.IO, and handle the rest of the functionality with REST-API.\n"+
-    "when a new message post to a specific chat, thats message will be publish trough `new` event.\n"+
-    "under the hood when a user subscribe to `new` event thats user join automatically to all chat rooms was user is a member"+
-    "then when a message posted published to rooms(chats)")
+    .setDescription(`
+    - handshake path is : /notification
+    - for receiving new messages, use 'new' event with this payload {token:Bearer 'login token'}
+    - after registering on 'new' event, the user automatically was registered to all chat rooms that user is a member
+    - then when a new message post to a chat, that message sended to 'chatId' event
+    - so for receiving new messages for each chat, should subscribe on  'chatId' events
+    - summary : for receiving new messages -> first subscribe on 'new', then subscribe to all 'chatId' events`)
     .setVersion("0.0.1")
     .setDefaultContentType('application/json')
     .addSecurity('user-password', {type: 'userPassword'})
