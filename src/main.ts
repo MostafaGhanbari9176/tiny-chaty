@@ -6,7 +6,7 @@ import { INestApplication } from '@nestjs/common';
 import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
 import { ConfigService } from '@nestjs/config';
 
-let appPort = 1089
+let appPort = 1997
 
 /**
  * generating documentation for REST-API.
@@ -51,8 +51,8 @@ async function setupAsyncApi(app: INestApplication) {
 
 async function bootstrap() {
   const config = new ConfigService()
-  appPort = config.get<number>("APP_PORT") || 1089
-  const docsIsOnline:string = config.get<string>("DOCS_IS_ONLINE") || "false"
+  appPort = config.get<number>("APP_PORT") || 1997
+  const docsIsOnline:string = config.get<string>("CREATE_DOCS") || "false"
 
   const app = await NestFactory.create(AppModule);
 

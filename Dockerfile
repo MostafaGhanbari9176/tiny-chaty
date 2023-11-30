@@ -1,8 +1,14 @@
-#VERSION=1
-FROM node:14.15.0-alpine AS build
+#VERSION=2
+FROM node:21.2.0-alpine3.18 AS build
+ENV NODE_ENV production
 WORKDIR /home/app/
 COPY ./ ./
-RUN npm run build
-EXPOSE 8089
-ENTRYPOINT /bin/sh -c 'node ./dist/main.js'
+RUN npm install --production && npm run build
+
+FROM node:21.2.0-alpine3.18
+ENV NODE_ENV production
+WORKDIR /home/app/
+COPY --from=build /home/app/dist ./
+EXPOSE 1997
+ENTRYPOINT ["node", "./dist/main.js"]
 

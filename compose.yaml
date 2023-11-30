@@ -1,0 +1,20 @@
+#VERSION=1
+services:
+  chat:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://root:1234@mongo:27017/
+    ports:
+      - 1997:8080
+    depends_on: 
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    environment:
+     MONGO_INITDB_ROOT_USERNAME: root
+     MONGO_INITDB_ROOT_PASSWORD: '1234'
+     MONGO_INITDB_DATABASE: 'chat'
+
