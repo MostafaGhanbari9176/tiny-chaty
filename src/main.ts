@@ -4,8 +4,9 @@ import { ValidationPipe } from './pipe/validation.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
+import { ConfigService } from '@nestjs/config';
 
-const appPort = 3000
+let appPort = 1089
 
 /**
  * generating documentation for REST-API.
@@ -36,7 +37,7 @@ async function setupAsyncApi(app: INestApplication) {
     - summary : for receiving new messages -> first subscribe on 'new', then subscribe to all 'chatId' events`)
     .setVersion("0.0.1")
     .setDefaultContentType('application/json')
-    .addSecurity('user-password', {type: 'userPassword'})
+    .addSecurity('user-password', { type: 'userPassword' })
     .addServer('/notification', {
       protocol: 'socket.io',
       url: `ws://127.0.0.1:${appPort}`
@@ -49,13 +50,21 @@ async function setupAsyncApi(app: INestApplication) {
 }
 
 async function bootstrap() {
+  const config = new ConfigService()
+  appPort = config.get<number>("APP_PORT") || 1089
+  const docsIsOnline:string = config.get<string>("DOCS_IS_ONLINE") || "false"
+
   const app = await NestFactory.create(AppModule);
 
-  await setupAsyncApi(app)
-  setupOpenApi(app)
+  if (docsIsOnline == "true") {
+    await setupAsyncApi(app)
+    setupOpenApi(app)
+  }
 
   app.useGlobalPipes(new ValidationPipe())
-  await app.listen(appPort);
+  await app.listen(appPort, () => {
+    console.log(`server listen on ${appPort} ${docsIsOnline == "true" ? ", REST-DOCS:/rest-api, SOCKET-DOCS:/event-api" : ""}`)
+  });
 }
 bootstrap();
 

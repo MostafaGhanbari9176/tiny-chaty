@@ -70,6 +70,15 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Environments
+ 
+- DATABASE_NAME -> application database name
+- MONGO_URI -> mongodb connection URI
+- APP_PORT -> application http and socket port
+- DOCS_IS_ONLINE -> if true the Docs are available otherwise not available
+
+
+
 ## Documentations
 
 - REST-API : ~/rest-api
@@ -80,7 +89,7 @@ $ npm run start:prod
 - handshake path is : /notification
 - for receiving new messages, use 'new' event with this payload {token:Bearer 'login token'}
 - after registering on 'new' event, the user automatically was registered to all chat rooms that user is a member
-- then when a new message post to a chat, that message sended to 'chatId' event
+- then when a new message post to a chat, that message was sended to 'chatId' event
 - so for receiving new messages for each chat, should subscribe on  'chatId' events
 - summary : for receiving new messages -> first subscribe on 'new', then subscribe to all 'chatId' events
 
