@@ -52,6 +52,13 @@ $ npm install
 # initialize mongodb container and run it
 $ docker run --name 'chatDB' -e MONGO_INITDB_ROOT_USERNAME='root' -e MONGO_INITDB_ROOT_PASSWORD='1234' -e MONGO_INITDB_DATABASE='chat' -dp 8081:27017 mongo:latest
 ```
+## Running with Docker
+
+```bash
+
+$ docker-compose up
+
+```
 
 ## Running the app
 
