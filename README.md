@@ -24,7 +24,7 @@
 
 ## Description
 
-back-end of a simple app chat, all functionality like Authentication,PostingMessages and etc are handle by REST-API and just sending new messages to chat members was handled by WebSocket.
+Back End of a simple chat app, all functionality like Authentication,PostingMessages and etc are handle by REST-API and just sending new messages to chat members was handled by WebSocket.
 
 ## Techs
 
